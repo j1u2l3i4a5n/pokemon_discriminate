@@ -18,23 +18,32 @@ for i in image_path1:
     image_paths2 = os.listdir('downloads/%s'%i)
     for j in image_paths2:
         try:
-            image = cv2.imread('downloads/%s/%s'%(i,j))
+            image = imread('downloads/%s/%s'%(i,j))
+            if image.shape[2] == 4:
+                image = np.delete(image, 3, 2)
+            
             image = cv2.resize(image, (100,100))
-            if image.dtype != 'float':
+            if not 'float' in str(image.dtype):
                 image = image / 255
+                
             data.append(image)
-        except Exception as e:
+        except:
             try:
-                image = imread('downloads/%s/%s'%(i,j))
+                image = cv2.imread('downloads/%s/%s'%(i,j))
                 if image.shape[2] == 4:
                     image = np.delete(image, 3, 2)
-                
+                    
                 image = cv2.resize(image, (100,100))
-                if image.dtype != 'float':
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)    
+
+                if not 'float' in str(image.dtype):
                     image = image / 255
-                    data.append(image)
-            except:
-                pass
+
+                data.append(image)
+                
+            except Exception as e:
+                print(e)
+                print(i,j)
             
     data = np.array(data)
     np.save('data/%s.npy'%i, data)
